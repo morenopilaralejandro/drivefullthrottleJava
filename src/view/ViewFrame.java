@@ -17,17 +17,22 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.ImageIcon;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.CardLayout;
+
 import javax.swing.ButtonGroup;
 import java.awt.Insets;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
+import javax.swing.JComboBox;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
 
 public class ViewFrame extends JFrame {
 
@@ -44,6 +49,12 @@ public class ViewFrame extends JFrame {
 	private String str8="A";
 	private String str9="B";
 	private String str10="C";
+	private String str11="Difficulty";
+	private String str12="Category";
+	private String str13="Save";
+	private String str14="Clear";
+	private String str15="Delete";
+	private String str16="Exit";
 	
 	private String strTbl0="Id";
 	private String strTbl1="Question";
@@ -53,6 +64,8 @@ public class ViewFrame extends JFrame {
 	//class
 	private QuestionInterface qObj = QuestionFactory.getQuestionObject();	
 	private ArrayList<QuestionInterface> qArr;
+	private String[] diffArr;
+
 	
 	//gui
 	private JPanel contentPane;
@@ -63,6 +76,7 @@ public class ViewFrame extends JFrame {
 	private JTextArea taOption0;
 	private JTextArea tfOption1;
 	private JTextArea taOption2;
+	private JLabel lblImgQ;
 
 	
 	
@@ -138,7 +152,7 @@ public class ViewFrame extends JFrame {
 		
 		tfId = new JTextField();
 		lblId.setLabelFor(tfId);
-		tfId.setBounds(30, 104, 36, 19);
+		tfId.setBounds(30, 102, 36, 19);
 		qPanel.add(tfId);
 		tfId.setColumns(10);
 		
@@ -148,7 +162,7 @@ public class ViewFrame extends JFrame {
 		
 		tfImg = new JTextField();
 		lblImg.setLabelFor(tfImg);
-		tfImg.setBounds(158, 104, 140, 19);
+		tfImg.setBounds(161, 102, 140, 19);
 		qPanel.add(tfImg);
 		tfImg.setColumns(10);
 		
@@ -226,6 +240,52 @@ public class ViewFrame extends JFrame {
 		taOption2.setMargin(new Insets(2, 2, 2, 2));
 		taOption2.setColumns(10);
 		
+		JLabel lblDiff = new JLabel(str11);
+		lblDiff.setBounds(12, 408, 70, 15);
+		qPanel.add(lblDiff);
+		
+		diffArr= new String[3];
+		diffArr[0]="1";
+		diffArr[1]="2";
+		diffArr[2]="3";
+		JComboBox<String> cbDiff = new JComboBox<String>(diffArr);
+		cbDiff.setBounds(84, 403, 59, 24);
+		qPanel.add(cbDiff);
+		
+		JLabel lblCat = new JLabel(str12);
+		lblCat.setBounds(161, 408, 70, 15);
+		qPanel.add(lblCat);
+		
+		JComboBox<String> cbCat = new JComboBox<String>();
+		cbCat.setBounds(243, 403, 254, 24);
+		qPanel.add(cbCat);
+		
+		JPanel auxPanel2 = new JPanel();
+		auxPanel2.setBounds(285, 486, 212, 64);
+		qPanel.add(auxPanel2);
+		auxPanel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JButton btnSaveQ = new JButton(str13);
+		btnSaveQ.setPreferredSize(new Dimension(90, 25));
+		auxPanel2.add(btnSaveQ);
+		
+		JButton btnClearQ = new JButton(str14);
+		btnClearQ.setPreferredSize(new Dimension(90, 25));
+		auxPanel2.add(btnClearQ);
+		
+		JButton btnDeleteQ = new JButton(str15);
+		btnDeleteQ.setPreferredSize(new Dimension(90, 25));
+		auxPanel2.add(btnDeleteQ);
+		
+		JButton btnExitQ = new JButton(str16);
+		btnExitQ.setPreferredSize(new Dimension(90, 25));
+		auxPanel2.add(btnExitQ);
+		
+		lblImgQ = new JLabel("");
+		lblImgQ.setBounds(12, 435, 164, 115);
+		lblImgQ.setVisible(false);
+		qPanel.add(lblImgQ);
+		
 		//table on click
 		tblQ.getSelectionModel().addListSelectionListener((ListSelectionListener) new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
@@ -240,6 +300,19 @@ public class ViewFrame extends JFrame {
 	        	tfOption1.setText(qObj.getoArr()[1]);
 	        	taOption2.setText(qObj.getoArr()[2]);
 	        	
+				try {
+					lblImgQ.setVisible(false);
+					String imgRoute = qObj.getImg();
+					if (imgRoute != null) {
+						lblImgQ.setIcon(new ImageIcon(ViewFrame.class.getResource("/link_img/" + imgRoute)));
+						lblImgQ.setVisible(true);
+					}
+				} catch (Exception e) {
+					lblImgQ.setVisible(false);
+				}
+	        	
+	        	
+	        	//check radio
 	        	rdOption.clearSelection();
 	        	switch(qObj.getCorrectAnswer()) {
 	        		case 0:
