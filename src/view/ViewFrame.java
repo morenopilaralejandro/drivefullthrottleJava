@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
@@ -38,7 +39,6 @@ public class ViewFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	//text strings
-	private String str0="DriveFullThrottle";
 	private String str1="DriveFullThrottle";
 	private String str2="Manage Questions";
 	private String str3="ID";
@@ -101,12 +101,13 @@ public class ViewFrame extends JFrame {
 	 */
 	public ViewFrame() {
 		setResizable(false);
-		setTitle(str0);
+		setTitle(str1);
+		ImageIcon favIcon = new ImageIcon(this.getClass().getResource("/link_img/favicon-32x32.png"));
+		setIconImage(favIcon.getImage());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 529, 599);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 		contentPane.setLayout(new CardLayout(0, 0));
 		
@@ -134,6 +135,7 @@ public class ViewFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				homePanel.setVisible(false);
 				qPanel.setVisible(true);
+				setTitle(str1+" - "+str2);
 				refreshQ();
 			}
 		});
@@ -282,7 +284,7 @@ public class ViewFrame extends JFrame {
 		auxPanel2.add(btnExitQ);
 		
 		lblImgQ = new JLabel("");
-		lblImgQ.setBounds(12, 435, 164, 115);
+		lblImgQ.setBounds(12, 435, 160, 115);
 		lblImgQ.setVisible(false);
 		qPanel.add(lblImgQ);
 		
@@ -292,6 +294,7 @@ public class ViewFrame extends JFrame {
 	        	int clickedId = (int) tblQ.getValueAt(tblQ.getSelectedRow(), 0);
 	        	qObj = findElementById(clickedId);
 	            
+	        	//fields
 	        	tfId.setText(""+qObj.getIdQ());
 	        	tfId.setEditable(false);
 	        	tfImg.setText(qObj.getImg());
@@ -300,11 +303,16 @@ public class ViewFrame extends JFrame {
 	        	tfOption1.setText(qObj.getoArr()[1]);
 	        	taOption2.setText(qObj.getoArr()[2]);
 	        	
+	        	//img
 				try {
 					lblImgQ.setVisible(false);
 					String imgRoute = qObj.getImg();
 					if (imgRoute != null) {
-						lblImgQ.setIcon(new ImageIcon(ViewFrame.class.getResource("/link_img/" + imgRoute)));
+						ImageIcon imagIcon = new ImageIcon(ViewFrame.class.getResource("/link_img/" + imgRoute));
+						Image img = imagIcon.getImage().getScaledInstance(160, 115,  java.awt.Image.SCALE_SMOOTH);; 
+						imagIcon = new ImageIcon(img);
+						
+						lblImgQ.setIcon(imagIcon);
 						lblImgQ.setVisible(true);
 					}
 				} catch (Exception e) {

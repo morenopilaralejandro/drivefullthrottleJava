@@ -1,20 +1,10 @@
 drop table if exists question;
 drop table if exists category;
-drop table if exists catGroup;
-
-create table catGroup(
-	id_catGroup int auto_increment,
-	name varchar(20),
-	constraint pk_cg primary key(id_catGroup)
-); 
 
 create table category(
 	id_cat int auto_increment,
 	name varchar(20),
-	catGroup int,
-	constraint pk_c primary key(id_cat),
-	constraint fk_c foreign key(catGroup) 
-		references catGroup(id_catGroup) on delete cascade on update cascade
+	constraint pk_c primary key(id_cat)
 ); 
 
 create table question(
@@ -32,8 +22,37 @@ create table question(
 		references category(id_cat) on delete cascade on update cascade
 );
 
-insert into catGroup values (1,'unset');
-insert into category values (1,'unset',1);
+insert into category values (1,'unset');
+insert into category values (2,'Vehículos');
+insert into category values (3,'Documentos');
+insert into category values (4,'Permisos');
+insert into category values (5,'Seguro');
+insert into category values (6,'Agentes');
+insert into category values (7,'Balizamiento');
+insert into category values (8,'Semáforos');
+insert into category values (9,'Verticales');
+insert into category values (10,'Marcas viales');
+insert into category values (11,'Tipos de vías');
+insert into category values (12,'Circulación por el arcén');
+insert into category values (13,'Carriles');
+insert into category values (14,'Circulación de animales y peatones');
+insert into category values (15,'Velocidades');
+insert into category values (16,'Distancias entre vehículos');
+insert into category values (17,'Maniobras');
+insert into category values (18,'Vehículo adelantado');
+insert into category values (19,'Luces');
+insert into category values (20,'Prioridad de paso');
+insert into category values (21,'Estrechamientos');
+insert into category values (22,'Ruedas');
+insert into category values (23,'Frenos');
+insert into category values (24,'Mecánica',1);
+insert into category values (25,'Mecánica de motos');
+insert into category values (26,'Transporte de personas');
+insert into category values (27,'Transporte de mercancías');
+insert into category values (28,'Distracciones');
+insert into category values (29,'Accidentes');
+insert into category values (30,'Alcohol');
+insert into category values (31,'Drogas');
 
 delete from question;
 
@@ -237,10 +256,6 @@ insert into question values (
 );
 
 
-
-
-
-
 insert into question values (
     aaaaaaaaaa,
     'img1.jpg',
@@ -251,5 +266,3 @@ insert into question values (
     1,
     1,1
 );
-
-
