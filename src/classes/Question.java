@@ -33,6 +33,92 @@ public class Question implements QuestionInterface {
 	}
 	
 	@Override
+	public QuestionInterface getQuestionById(int id) {
+		QuestionInterface res = null;
+		try {
+			Connection con = new Connect().getCon();
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from question where id_q="+id+";");
+			while (rs.next()) {
+				res=new Question(
+						rs.getInt(1), rs.getString(2),  rs.getString(3), 
+						rs.getString(4),  rs.getString(5),  rs.getString(6), 
+						rs.getInt(7), rs.getInt(8),  rs.getInt(9));
+			}
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	@Override
+	public Collection<QuestionInterface> getAllQuestion() {
+		ArrayList<QuestionInterface> res = new ArrayList<QuestionInterface>();
+		try {
+			Connection con = new Connect().getCon();
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from question");
+			while (rs.next()) {
+				res.add(new Question(
+						rs.getInt(1), rs.getString(2),  rs.getString(3), 
+						rs.getString(4),  rs.getString(5),  rs.getString(6), 
+						rs.getInt(7), rs.getInt(8),  rs.getInt(9)));
+			}
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	@Override
+	public void delete() {
+		try {
+			Connection con = new Connect().getCon();
+			Statement stmt = con.createStatement();
+			stmt.execute("delete from question where id_q="+this.idQ+";");
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public QuestionInterface insert(int idQ, String img, String stmnt, 
+			String o0, String o1, String o2,int correctAnswer, 
+			int difficulty, int category) {
+		QuestionInterface qAux=null;
+		int idAux=0;
+		try {
+			/*idQ parameter == 0 -> auto increment*/
+			Connection con = new Connect().getCon();
+			if(idQ==0) {
+				Statement stmt1 = con.createStatement();
+				stmt1.execute("insert into question(img,stmnt,o0,o1,o2,correctAnswer,difficulty,category) values ('"+
+						img+"','"+stmnt+"','"+o0+"','"+o1+"','"+o2+"',"+correctAnswer+","+difficulty+","+category+");");
+				
+				Statement stmt2 = con.createStatement();
+				ResultSet rs = stmt2.executeQuery("select last_insert_id();");
+				while (rs.next()) {
+					idAux=rs.getInt(1);
+				}
+			}else {
+				idAux=idQ;
+				Statement stmt1 = con.createStatement();
+				stmt1.execute("insert into question(id_q, img,stmnt,o0,o1,o2,correctAnswer,difficulty,category) values ("+
+						idQ+",'"+img+"','"+stmnt+"','"+o0+"','"+o1+"','"+o2+"',"+correctAnswer+","+difficulty+","+category+");");
+			}
+			qAux= new Question(idAux, img, stmnt, o0, o1, o2, correctAnswer, difficulty, category);
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return qAux;
+	}
+	
+	
+	@Override
 	public int getIdQ() {
 		return idQ;
 	}
@@ -173,98 +259,13 @@ public class Question implements QuestionInterface {
 		}
 	}
 
-
-
-	@Override
-	public QuestionInterface getQuestionById(int id) {
-		QuestionInterface res = null;
-		try {
-			Connection con = new Connect().getCon();
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from question where id_q="+id+";");
-			while (rs.next()) {
-				res=new Question(
-						rs.getInt(1), rs.getString(2),  rs.getString(3), 
-						rs.getString(4),  rs.getString(5),  rs.getString(6), 
-						rs.getInt(7), rs.getInt(8),  rs.getInt(9));
-			}
-			con.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return res;
-	}
-
-	@Override
-	public Collection<QuestionInterface> getAllQuestion() {
-		ArrayList<QuestionInterface> res = new ArrayList<QuestionInterface>();
-		try {
-			Connection con = new Connect().getCon();
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from question");
-			while (rs.next()) {
-				res.add(new Question(
-						rs.getInt(1), rs.getString(2),  rs.getString(3), 
-						rs.getString(4),  rs.getString(5),  rs.getString(6), 
-						rs.getInt(7), rs.getInt(8),  rs.getInt(9)));
-			}
-			con.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return res;
-	}
-
-	@Override
-	public void delete() {
-		try {
-			Connection con = new Connect().getCon();
-			Statement stmt = con.createStatement();
-			stmt.execute("delete from question where id_q="+this.idQ+";");
-			con.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public QuestionInterface insert(int idQ, String img, String stmnt, 
-			String o0, String o1, String o2,int correctAnswer, 
-			int difficulty, int category) {
-		QuestionInterface qAux=null;
-		int idAux=0;
-		try {
-			/*idQ parameter == 0 -> auto increment*/
-			Connection con = new Connect().getCon();
-			if(idQ==0) {
-				Statement stmt1 = con.createStatement();
-				stmt1.execute("insert into question(img,stmnt,o0,o1,o2,correctAnswer,difficulty,category) values ('"+
-						img+"','"+stmnt+"','"+o0+"','"+o1+"','"+o2+"',"+correctAnswer+","+difficulty+","+category+");");
-				
-				Statement stmt2 = con.createStatement();
-				ResultSet rs = stmt2.executeQuery("select last_insert_id();");
-				while (rs.next()) {
-					idAux=rs.getInt(1);
-				}
-			}else {
-				idAux=idQ;
-				Statement stmt1 = con.createStatement();
-				stmt1.execute("insert into question(id_q, img,stmnt,o0,o1,o2,correctAnswer,difficulty,category) values ("+
-						idQ+",'"+img+"','"+stmnt+"','"+o0+"','"+o1+"','"+o2+"',"+correctAnswer+","+difficulty+","+category+");");
-			}
-			qAux= new Question(idAux, img, stmnt, o0, o1, o2, correctAnswer, difficulty, category);
-			con.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return qAux;
-	}
+	
 	@Override
 	public String toString() {
 		return "Question [idQ=" + idQ + ", img=" + img + ", stmnt=" + stmnt + ", oArr=" + Arrays.toString(oArr)
 				+ ", correctAnswer=" + correctAnswer + ", difficulty=" + difficulty + ", category=" + category + "]";
 	}
 	
-
-
+	
+	
 }

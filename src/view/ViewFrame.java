@@ -10,6 +10,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import classes.CategoryFactory;
+import classes.CategoryInterface;
 import classes.QuestionFactory;
 import classes.QuestionInterface;
 
@@ -65,20 +67,24 @@ public class ViewFrame extends JFrame {
 	private QuestionInterface qObj = QuestionFactory.getQuestionObject();	
 	private ArrayList<QuestionInterface> qArr;
 	private String[] diffArr;
+	private CategoryInterface catObj = CategoryFactory.getCategoryObject();
+	private ArrayList<CategoryInterface> catArr;
 
-	
 	//gui
+	private boolean editEnabled;
 	private JPanel contentPane;
 	private JTable tblQ;
 	private JTextField tfId;
 	private JTextField tfImg;
 	private JTextArea taQuestion;
+	ButtonGroup rdOption;
 	private JTextArea taOption0;
-	private JTextArea tfOption1;
+	private JTextArea taOption1;
 	private JTextArea taOption2;
+	JComboBox<String> cbDiff;
+	JComboBox<String> cbCat;
 	private JLabel lblImgQ;
 
-	
 	
 	/**
 	 * Launch the application.
@@ -110,6 +116,7 @@ public class ViewFrame extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new CardLayout(0, 0));
+		editEnabled=true;
 		
 		JPanel homePanel = new JPanel();
 		contentPane.add(homePanel, "name_2396510668496");
@@ -136,6 +143,7 @@ public class ViewFrame extends JFrame {
 				homePanel.setVisible(false);
 				qPanel.setVisible(true);
 				setTitle(str1+" - "+str2);
+				clearManageQuestion();
 				refreshQ();
 			}
 		});
@@ -204,7 +212,7 @@ public class ViewFrame extends JFrame {
 		rdOption2.setBounds(12, 348, 36, 23);
 		qPanel.add(rdOption2);
 		
-		ButtonGroup rdOption= new ButtonGroup();
+		rdOption= new ButtonGroup();
 		rdOption.add(rdOption0);
 		rdOption.add(rdOption1);
 		rdOption.add(rdOption2);
@@ -224,12 +232,12 @@ public class ViewFrame extends JFrame {
 		scTaOption1Pane.setBounds(84, 293, 413, 43);
 		qPanel.add(scTaOption1Pane);
 		
-		tfOption1 = new JTextArea();
-		tfOption1.setWrapStyleWord(true);
-		tfOption1.setLineWrap(true);
-		scTaOption1Pane.setViewportView(tfOption1);
-		tfOption1.setMargin(new Insets(2, 2, 2, 2));
-		tfOption1.setColumns(10);
+		taOption1 = new JTextArea();
+		taOption1.setWrapStyleWord(true);
+		taOption1.setLineWrap(true);
+		scTaOption1Pane.setViewportView(taOption1);
+		taOption1.setMargin(new Insets(2, 2, 2, 2));
+		taOption1.setColumns(10);
 		
 		JScrollPane scTaOption2Pane = new JScrollPane();
 		scTaOption2Pane.setBounds(84, 348, 413, 43);
@@ -250,7 +258,7 @@ public class ViewFrame extends JFrame {
 		diffArr[0]="1";
 		diffArr[1]="2";
 		diffArr[2]="3";
-		JComboBox<String> cbDiff = new JComboBox<String>(diffArr);
+		cbDiff = new JComboBox<String>(diffArr);
 		cbDiff.setBounds(84, 403, 59, 24);
 		qPanel.add(cbDiff);
 		
@@ -258,7 +266,13 @@ public class ViewFrame extends JFrame {
 		lblCat.setBounds(161, 408, 70, 15);
 		qPanel.add(lblCat);
 		
-		JComboBox<String> cbCat = new JComboBox<String>();
+		catArr = (ArrayList<CategoryInterface>) catObj.getAllCategories();
+		String[] catArrAux = new String[catArr.size()];
+		for (int i=0; i<catArr.size(); i++) {
+			catArrAux[i]=catArr.get(i).getIdCat()+
+					" - "+catArr.get(i).getName();
+		}
+		cbCat = new JComboBox<String>(catArrAux);
 		cbCat.setBounds(243, 403, 254, 24);
 		qPanel.add(cbCat);
 		
@@ -268,18 +282,45 @@ public class ViewFrame extends JFrame {
 		auxPanel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JButton btnSaveQ = new JButton(str13);
+		btnSaveQ.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(editEnabled) {
+					
+				}else {
+					
+				}
+			}
+		});
 		btnSaveQ.setPreferredSize(new Dimension(90, 25));
 		auxPanel2.add(btnSaveQ);
 		
 		JButton btnClearQ = new JButton(str14);
+		btnClearQ.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				clearManageQuestion();
+			}
+		});
 		btnClearQ.setPreferredSize(new Dimension(90, 25));
 		auxPanel2.add(btnClearQ);
 		
 		JButton btnDeleteQ = new JButton(str15);
+		btnDeleteQ.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		btnDeleteQ.setPreferredSize(new Dimension(90, 25));
 		auxPanel2.add(btnDeleteQ);
 		
 		JButton btnExitQ = new JButton(str16);
+		//btn manage question Home -> Question
+		btnExitQ.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				qPanel.setVisible(false);
+				homePanel.setVisible(true);
+				setTitle(str1);
+			}
+		});
 		btnExitQ.setPreferredSize(new Dimension(90, 25));
 		auxPanel2.add(btnExitQ);
 		
@@ -291,50 +332,53 @@ public class ViewFrame extends JFrame {
 		//table on click
 		tblQ.getSelectionModel().addListSelectionListener((ListSelectionListener) new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
-	        	int clickedId = (int) tblQ.getValueAt(tblQ.getSelectedRow(), 0);
-	        	qObj = findElementById(clickedId);
-	            
-	        	//fields
-	        	tfId.setText(""+qObj.getIdQ());
-	        	tfId.setEditable(false);
-	        	tfImg.setText(qObj.getImg());
-	        	taQuestion.setText(qObj.getStmnt());
-	        	taOption0.setText(qObj.getoArr()[0]);
-	        	tfOption1.setText(qObj.getoArr()[1]);
-	        	taOption2.setText(qObj.getoArr()[2]);
-	        	
-	        	//img
-				try {
-					lblImgQ.setVisible(false);
-					String imgRoute = qObj.getImg();
-					if (imgRoute != null) {
-						ImageIcon imagIcon = new ImageIcon(ViewFrame.class.getResource("/link_img/" + imgRoute));
-						Image img = imagIcon.getImage().getScaledInstance(160, 115,  java.awt.Image.SCALE_SMOOTH);; 
-						imagIcon = new ImageIcon(img);
-						
-						lblImgQ.setIcon(imagIcon);
-						lblImgQ.setVisible(true);
+	        	int selectedRow = tblQ.getSelectedRow();
+	        	if (selectedRow>=0) {
+					int clickedId = (int) tblQ.getValueAt(selectedRow, 0);
+					qObj = findElementById(clickedId);
+					//fields
+		        	editEnabled=false;
+					tfId.setText("" + qObj.getIdQ());
+					tfId.setEditable(false);
+					tfImg.setText(qObj.getImg());
+					taQuestion.setText(qObj.getStmnt());
+					taOption0.setText(qObj.getoArr()[0]);
+					taOption1.setText(qObj.getoArr()[1]);
+					taOption2.setText(qObj.getoArr()[2]);
+					//img
+					try {
+						lblImgQ.setVisible(false);
+						String imgRoute = qObj.getImg();
+						if (imgRoute != null) {
+							ImageIcon imagIcon = new ImageIcon(ViewFrame.class.getResource("/link_img/" + imgRoute));
+							Image img = imagIcon.getImage().getScaledInstance(160, 115, java.awt.Image.SCALE_SMOOTH);
+							;
+							imagIcon = new ImageIcon(img);
+
+							lblImgQ.setIcon(imagIcon);
+							lblImgQ.setVisible(true);
+						}
+					} catch (Exception e) {
+						lblImgQ.setVisible(false);
 					}
-				} catch (Exception e) {
-					lblImgQ.setVisible(false);
+					//check radio
+					rdOption.clearSelection();
+					switch (qObj.getCorrectAnswer()) {
+					case 0:
+						rdOption0.setSelected(true);
+						break;
+					case 1:
+						rdOption1.setSelected(true);
+						break;
+					case 2:
+						rdOption2.setSelected(true);
+						break;
+					default:
+						rdOption0.setSelected(true);
+					}
+					cbDiff.setSelectedIndex(qObj.getDifficulty() - 1);
+					cbCat.setSelectedIndex(qObj.getCategory() - 1);
 				}
-	        	
-	        	
-	        	//check radio
-	        	rdOption.clearSelection();
-	        	switch(qObj.getCorrectAnswer()) {
-	        		case 0:
-	        			rdOption0.setSelected(true);
-	        			break;
-	        		case 1:
-	        			rdOption1.setSelected(true);
-	        			break;
-	        		case 2:
-	        			rdOption2.setSelected(true);
-	        			break;
-	        		default:
-	        			rdOption0.setSelected(true);
-	        	}
 	        }
 	    });
 	}
@@ -384,5 +428,21 @@ public class ViewFrame extends JFrame {
 	        	col.setPreferredWidth(20);
 	        }
 	    }   
+	}
+	
+	public void clearManageQuestion() {
+		tblQ.clearSelection();
+		editEnabled=true;
+		tfId.setEditable(true);
+		tfId.setText("");
+		tfImg.setText("");
+		taQuestion.setText("");
+		rdOption.clearSelection();
+		taOption0.setText("");
+		taOption1.setText("");
+		taOption2.setText("");
+		cbDiff.setSelectedIndex(0);
+		cbCat.setSelectedIndex(0);
+		lblImgQ.setVisible(false);
 	}
 }
