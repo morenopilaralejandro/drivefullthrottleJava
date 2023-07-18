@@ -18,15 +18,18 @@ import classes.QuestionInterface;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.awt.event.ActionEvent;
 import java.awt.CardLayout;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import java.awt.Insets;
 import javax.swing.JTable;
@@ -57,6 +60,12 @@ public class ViewFrame extends JFrame {
 	private String str14="Clear";
 	private String str15="Delete";
 	private String str16="Exit";
+	
+	private String str17="Record inserted.";
+	private String str18="Update record with ID ";
+	private String str19="Record updated.";
+	private String str20="Delete record with ID ";
+	private String str21="Record deleted.";
 	
 	private String strTbl0="Id";
 	private String strTbl1="Question";
@@ -284,10 +293,39 @@ public class ViewFrame extends JFrame {
 		JButton btnSaveQ = new JButton(str13);
 		btnSaveQ.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int idAux=0;
+				if(!tfId.getText().isEmpty()) {
+					idAux=Integer.parseInt(tfId.getText());
+				}
 				if(editEnabled) {
-					
+					qObj.insert(idAux, tfImg.getText(), taQuestion.getText(), 
+							taOption0.getText(), taOption1.getText(), taOption2.getText(), 
+							getSelectedRadio(), cbDiff.getSelectedIndex()+1, cbCat.getSelectedIndex()+1);
+					JOptionPane.showMessageDialog(null, str17, str1, JOptionPane.INFORMATION_MESSAGE);
+					clearManageQuestion();
+					refreshQ();
 				}else {
-					
+					 int conf = JOptionPane.showConfirmDialog(null, str18+idAux+"?", str1, 
+							 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					 if(conf==0) {
+						 int selectedRow = tblQ.getSelectedRow();
+						 if (selectedRow>=0) {
+							 int clickedId = (int) tblQ.getValueAt(selectedRow, 0);
+							 qObj = findElementById(clickedId);
+							 qObj.setImg(tfImg.getText());
+							 qObj.setStmnt(taQuestion.getText());
+							 String[] auxArr = new String[3];
+							 auxArr[0]=taOption0.getText();
+							 auxArr[1]=taOption1.getText();
+							 auxArr[2]=taOption2.getText();
+							 qObj.setoArr(auxArr);
+							 qObj.setCorrectAnswer(getSelectedRadio());
+							 qObj.setDifficulty(cbDiff.getSelectedIndex()+1);
+							 qObj.setCategory(cbCat.getSelectedIndex()+1);
+							 JOptionPane.showMessageDialog(null, str19, str1, JOptionPane.INFORMATION_MESSAGE);
+						 }
+						 refreshQ();
+					 }
 				}
 			}
 		});
@@ -306,14 +344,26 @@ public class ViewFrame extends JFrame {
 		JButton btnDeleteQ = new JButton(str15);
 		btnDeleteQ.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				 int selectedRow = tblQ.getSelectedRow();
+				 if (selectedRow>=0) {
+					 int clickedId = (int) tblQ.getValueAt(selectedRow, 0);
+					 qObj = findElementById(clickedId);
+					 int conf = JOptionPane.showConfirmDialog(null, str20+qObj.getIdQ()+"?", str1, 
+							 JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE); 
+					 if(conf==0) {
+						 qObj.delete();
+						 JOptionPane.showMessageDialog(null, str21, str1, JOptionPane.INFORMATION_MESSAGE);
+					 }
+				 }
+				 clearManageQuestion();
+				 refreshQ();
 			}
 		});
 		btnDeleteQ.setPreferredSize(new Dimension(90, 25));
 		auxPanel2.add(btnDeleteQ);
 		
 		JButton btnExitQ = new JButton(str16);
-		//btn manage question Home -> Question
+		//btn manage question Question -> Home
 		btnExitQ.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				qPanel.setVisible(false);
@@ -444,5 +494,19 @@ public class ViewFrame extends JFrame {
 		cbDiff.setSelectedIndex(0);
 		cbCat.setSelectedIndex(0);
 		lblImgQ.setVisible(false);
+	}
+	
+	public int getSelectedRadio() {
+		int res = 0;
+		int counter=0;
+		Enumeration<AbstractButton> auxEnum = rdOption.getElements();
+        while(auxEnum.hasMoreElements()) {
+            AbstractButton i = auxEnum.nextElement();
+            if (i.isSelected()) {
+                res=counter;
+            }
+            counter++;
+        }
+		return res;
 	}
 }

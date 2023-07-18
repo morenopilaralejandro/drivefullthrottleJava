@@ -18,7 +18,7 @@ public class Question implements QuestionInterface {
 	
 	Question(){}
 	Question(int idQ, String img, String stmnt, 
-			String o0, String o1, String o2,int correctAnswer, 
+			String o0, String o1, String o2, int correctAnswer, 
 			int difficulty, int category) {
 		this.idQ=idQ; 
 		this.img=img; 
@@ -191,8 +191,8 @@ public class Question implements QuestionInterface {
 			String o2Aux = oArr[2];
 			
 			stmt.execute("update question set "+
-					"o0='"+o0Aux+"' "+
-					"o1='"+o1Aux+"' "+
+					"o0='"+o0Aux+"', "+
+					"o1='"+o1Aux+"', "+
 					"o2='"+o2Aux+
 					"' where id_q="+this.idQ+";");
 			this.oArr = oArr;
